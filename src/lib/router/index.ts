@@ -65,21 +65,24 @@ const goTo = (path: string | RouteData) => {
     return routeChanged.prepend<any>(() => path);
   } else {
     const evt = createEvent<any>();
-    sample({
-      source: $routesEntries,
-      clock: evt,
-      fn: (entries) => {
-        for (const route of entries) {
-          const res = route.match(path);
-          if (res) {
-            return {
-              name: route.name,
-              params: res.params as { [key: string]: string | number },
-            };
+    guard({
+      source: sample({
+        source: $routesEntries,
+        clock: evt,
+        fn: (entries) => {
+          for (const route of entries) {
+            const res = route.match(path);
+            if (res) {
+              return {
+                name: route.name,
+                params: res.params as { [key: string]: string | number },
+              };
+            }
           }
-        }
-        return undefined;
-      },
+          return null;
+        },
+      }),
+      filter: (route) => !!route,
       target: routeChanged,
     });
     return evt;
