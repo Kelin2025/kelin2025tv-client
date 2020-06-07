@@ -1,4 +1,6 @@
 import { h } from "forest";
+import { Button } from "@/ui";
+import { goTo } from "@/lib/router";
 
 export const HomePage = {
   route: {
@@ -6,6 +8,13 @@ export const HomePage = {
     path: "/",
   },
   view: () => {
+    Button({
+      text: "Login",
+      data: { type: "primary" },
+      handler: {
+        click: goTo.prepend(() => ({ name: "login", params: {} })),
+      },
+    });
     h("div", { text: "adsf" });
   },
 };
