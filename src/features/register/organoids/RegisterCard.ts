@@ -35,7 +35,7 @@ export const RegisterCard = () => {
             data: { type: "secondary" },
             text: "Войти в аккаунт",
             handler: {
-              click: goTo.prepend(() => ({ name: "login", params: {} })),
+              click: goTo("/login"),
             },
           });
         });

@@ -14,6 +14,11 @@ type Route = {
   path: string;
 };
 
+type RouteData = {
+  name: string;
+  params?: { [key: string]: string | number };
+};
+
 type RouteEntry = {
   name: string;
   path: string;
@@ -22,7 +27,7 @@ type RouteEntry = {
   compile: Function;
 };
 
-const goTo = createEvent<{ name: string; params: {} }>();
+const routeChanged = createEvent<RouteData>();
 const setRoutes = createEvent<Route[]>();
 const recheck = createEvent();
 
@@ -55,10 +60,36 @@ const $currentRoute = combine({
 });
 const $save = createStore(true);
 
+const goTo = (path: string | RouteData) => {
+  if (typeof path === "object") {
+    return routeChanged.prepend<any>(() => path);
+  } else {
+    const evt = createEvent<any>();
+    sample({
+      source: $routesEntries,
+      clock: evt,
+      fn: (entries) => {
+        for (const route of entries) {
+          const res = route.match(path);
+          if (res) {
+            return {
+              name: route.name,
+              params: res.params as { [key: string]: string | number },
+            };
+          }
+        }
+        return undefined;
+      },
+      target: routeChanged,
+    });
+    return evt;
+  }
+};
+
 const { found: routeFound, __: routeNotFound } = split(
   sample({
     source: $routesEntries,
-    clock: goTo,
+    clock: routeChanged,
     fn: (entries, route) => ({ entries, route }),
   }),
   {
@@ -79,14 +110,15 @@ const redirect = ({ from, to, condition }) => {
       }
       return true;
     }),
-    target: goTo.prepend(() => to),
+    target: routeChanged.prepend(() => to),
   });
 };
 
 $name.on(routeFound, (state, { route }) => route.name);
-$params.on(routeFound, (state, { route }) => route.params);
+$params.on(routeFound, (state, { route }) => route.params || {});
 $routes.on(setRoutes, (state, routes) => routes);
-$save.on(goTo, (state, { save }) => (save === false ? false : true));
+// @ts-ignore
+$save.on(routeChanged, (state, { save }) => (save === false ? false : true));
 
 combine({ params: $params, path: $currentPath, save: $save }).updates.watch(
   ({ params, path, save }) => {
@@ -111,7 +143,7 @@ guard({
     },
   }),
   filter: (data) => !!data,
-  target: goTo,
+  target: routeChanged,
 });
 
 window.onpopstate = (evt) => {
@@ -124,13 +156,13 @@ forward({
 });
 
 export {
-  goTo,
   $routes,
   $currentPath,
   $currentRoute,
   $name as $currentRouteName,
   $params as $currentRouteParams,
   $currentRouteEntry,
+  goTo,
   redirect,
   setRoutes,
   routeFound,

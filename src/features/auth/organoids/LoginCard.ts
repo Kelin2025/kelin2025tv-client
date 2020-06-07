@@ -15,6 +15,8 @@ import {
 import { EmailField } from "../atoms/EmailField";
 import { PasswordField } from "../atoms/PasswordField";
 
+const goToSignUp = goTo("/signup");
+
 export const LoginCard = () => {
   Card(() => {
     Form(() => {
@@ -35,7 +37,7 @@ export const LoginCard = () => {
             data: { type: "secondary" },
             text: "Создать аккаунт",
             handler: {
-              click: goTo.prepend(() => ({ name: "register", params: {} })),
+              click: goToSignUp,
             },
           });
         });

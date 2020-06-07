@@ -12,7 +12,7 @@ export const HomePage = {
       text: "Login",
       data: { type: "primary" },
       handler: {
-        click: goTo.prepend(() => ({ name: "login", params: {} })),
+        click: goTo("/login"),
       },
     });
     h("div", { text: "adsf" });
