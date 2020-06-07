@@ -1,0 +1,17 @@
+@import "../fonts/stylesheet.css";
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font: 16px "Circular Std", sans-serif;
+  background: #191919;
+  color: #c2ccd7;
+}
