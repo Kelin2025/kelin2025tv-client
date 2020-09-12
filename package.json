@@ -17,7 +17,7 @@
     "foliage": "^0.102.1",
     "forest": "^0.16.1",
     "nanoid": "^2.1.11",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "path-to-regexp": "^6.1.0",
     "patronum": "^0.13.1"
   },
